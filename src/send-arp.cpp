@@ -40,7 +40,9 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
 
     struct ArpHdr* ARPHeader;
     
-    sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request);
+    if(sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request)) {
+        return false;
+    }
 
     while( true ) {
         res = pcap_next_ex(pcap, &header, &packet);
@@ -115,4 +117,21 @@ bool attackARP(pcap_t* pcap,
     }
 
     return true;
+}
+
+void printInfo(const Mac& myMAC, const Ip& myIP, 
+               const Mac& sendMAC, const Ip& sendIP, 
+               const Ip& targetIP) {
+    std::cout << "========================================\n"; 
+    std::cout << "[[Attacker's Info]]\n"; 
+    std::cout << "[MAC] " << std::string(myMAC) << '\n';
+    std::cout << "[IP] " << std::string(myIP) << '\n';
+    std::cout << "========================================\n"; 
+    std::cout << "[[Sender's Info]]\n"; 
+    std::cout << "[MAC] " << std::string(sendMAC) << '\n'; 
+    std::cout << "[IP] " << std::string(sendIP) << '\n'; 
+    std::cout << "========================================\n"; 
+    std::cout << "[[Target's Info]]\n";
+    std::cout << "[IP] " << std::string(targetIP) << '\n'; 
+    std::cout << "========================================\n";
 }

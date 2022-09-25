@@ -41,3 +41,7 @@ bool sendPacketARP(pcap_t* pcap,
 bool attackARP(pcap_t* pcap, 
                const Mac& sendMAC, const Ip& sendIP, 
                const Mac& myMAC, const Ip& targetIP);
+
+void printInfo(const Mac& myMAC, const Ip& myIP, 
+               const Mac& sendMAC, const Ip& sendIP, 
+               const Ip& targetIP);

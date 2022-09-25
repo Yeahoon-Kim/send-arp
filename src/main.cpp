@@ -62,6 +62,9 @@ int main(int argc, char* argv[]) {
         targetIP = Ip(argv[i << 1 + 1]);
 
         if(not getMACByIP(pcap, sendMAC, sendIP, myMAC, myIP)) return 1;
+        
+        printInfo(myMAC, myIP, sendMAC, sendIP, targetIP);
+
         if(not attackARP(pcap, sendMAC, sendIP, myMAC, targetIP)) return 1;
 
         cout << "Successfully change sender(" << argv[i << 1] << ")'s ARP table\n";
