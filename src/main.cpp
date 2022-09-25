@@ -58,8 +58,8 @@ int main(int argc, char* argv[]) {
 
     // send ARP packet at each sender, target
     for(i = 1; i < (argc >> 1); i++) {
-        sendIP = Ip(argv[i << 1]);
-        targetIP = Ip(argv[i << 1 + 1]);
+        sendIP = Ip(string(argv[i << 1]));
+        targetIP = Ip(string(argv[i << 1 + 1]));
 
         if(not getMACByIP(pcap, sendMAC, sendIP, myMAC, myIP)) return 1;
         if(not attackARP(pcap, sendMAC, sendIP, myMAC, targetIP)) return 1;
