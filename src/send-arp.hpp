@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/socket.h> // socket, AF_INET
-#include <sys/types.h>
+#include <sys/types.h>  // some historical (BSD) implementations required this header file, and portable applications are probably wise to include it.
 #include <arpa/inet.h>  // inet_ntop
 #include <sys/ioctl.h>  // ioctl
 #include <net/if.h>     // ifreq
@@ -16,6 +16,8 @@
 #include "ethhdr.hpp"
 #include "arphdr.hpp"
 
+#define DEBUG
+
 #pragma pack(push, 1)
 struct EthArpPacket final {
 	EthHdr eth_;
@@ -26,6 +28,7 @@ struct EthArpPacket final {
 #define CREATE_SOCKET_ERROR_MSG "Error: Error while create socket\n"
 #define IOCTL_ERROR_MSG "Error: Error while ioctl\n"
 #define SEND_PACKET_ERROR_MSG "Error: Error while send packet\n"
+#define CLOSE_ERROR_MSG "Error: Error while close file descriptor\n"
 
 #define PCAP_RECEIVE_PACKET_ERROR "Error : Error while pcap_next_ex: "
 

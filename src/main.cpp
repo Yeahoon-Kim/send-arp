@@ -53,19 +53,44 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+#ifdef DEBUG
+    cout << "[DEBUG] Completely open pcap\n";
+#endif
+
     // get local information
     if(not getMyInfo(dev, myMAC, myIP)) return 1;
 
+#ifdef DEBUG
+    cout << "[DEBUG] Completely get local information\n";
+    cout << "[DEBUG] MyMAC : " << string(myMAC) << '\n';
+    cout << "[DEBUG] MyIP  : " << string(myIP) << '\n';
+#endif
+
     // send ARP packet at each sender, target
     for(i = 1; i < (argc >> 1); i++) {
+
+#ifdef DEBUG
+        cout << "[DEBUG] sendIP   : " << argv[i << 1] << '\n';
+        cout << "[DEBUG] targetIP : " << argv[(i << 1) + 1] << '\n';
+#endif
+        
         sendIP = Ip(argv[i << 1]);
         targetIP = Ip(argv[(i << 1) + 1]);
 
         if(not getMACByIP(pcap, sendMAC, sendIP, myMAC, myIP)) return 1;
+
+#ifdef DEBUG
+        cout << "[DEBUG] Completely get MAC by IP\n";
+        cout << "[DEBUG] sendMAC : " << string(sendMAC) << '\n';
+#endif
         
         printInfo(myMAC, myIP, sendMAC, sendIP, targetIP);
 
         if(not attackARP(pcap, sendMAC, sendIP, myMAC, targetIP)) return 1;
+
+#ifdef DEBUG
+        cout << "[DEBUG] Completely send ARP packet\n";
+#endif
 
         cout << "Successfully change sender(" << argv[i << 1] << ")'s ARP table\n";
     }
