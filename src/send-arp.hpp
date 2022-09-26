@@ -17,7 +17,7 @@
 #include "ethhdr.hpp"
 #include "arphdr.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 #pragma pack(push, 1)
 struct EthArpPacket final {
