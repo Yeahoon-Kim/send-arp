@@ -116,6 +116,12 @@ bool sendPacketARP(pcap_t* pcap,
 
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully get into function 'sendPacketARP'\n";
+    std::cout << "[DEBUG] sourceMAC      : " << std::string(sourceMAC) << '\n';
+    std::cout << "[DEBUG] destinationMAC : " << std::string(destMAC) << '\n';
+    std::cout << "[DEBUG] sendMAC        : " << std::string(sendMAC) << '\n';
+    std::cout << "[DEBUG] targetMAC      : " << std::string(targetMAC) << '\n';
+    std::cout << "[DEBUG] sendIP         : " << std::string(sendIP) << '\n';
+    std::cout << "[DEBUG] targetIP       : " << std::string(targetIP) << '\n';
 #endif
 
     // Set Ethernet header
