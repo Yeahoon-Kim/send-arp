@@ -6,6 +6,7 @@
 bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     int sockfd;
     struct ifreq ifr = {0, };
+    char buf[]
 
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully get into function 'getMyInfo'\n";
@@ -38,8 +39,8 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     std::cout << "[DEBUG] Successfully process ioctl\n";
 #endif
 
-    MAC = (uint8_t *)ifr.ifr_hwaddr.sa_data;
-    IP = ((sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr;
+    MAC = (uint8_t *)ifr.ifr_addr.sa_data;
+    IP = Ip(inet_ntoa(((sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 
     if(close(sockfd)) {
         std::cerr << CLOSE_ERROR_MSG;
