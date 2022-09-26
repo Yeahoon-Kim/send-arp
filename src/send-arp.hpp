@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <sys/socket.h> // socket, AF_INET
 #include <sys/types.h>  // some historical (BSD) implementations required this header file, and portable applications are probably wise to include it.
@@ -29,6 +30,7 @@ struct EthArpPacket final {
 #define IOCTL_ERROR_MSG "Error: Error while ioctl\n"
 #define SEND_PACKET_ERROR_MSG "Error: Error while send packet\n"
 #define CLOSE_ERROR_MSG "Error: Error while close file descriptor\n"
+#define GET_MAC_ERROR_MSG "Error: Error while get local MAC address\n"
 
 #define PCAP_RECEIVE_PACKET_ERROR "Error : Error while pcap_next_ex: "
 

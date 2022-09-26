@@ -11,6 +11,20 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     std::cout << "[DEBUG] Successfully get into function 'getMyInfo'\n";
 #endif
 
+    // =========================================================================
+    // Find local MAC address
+    std::ifstream iface("/sys/class/net/" + interface + "/address");
+    std::string tempMAC((std::istreambuf_iterator<char>(iface)), std::istreambuf_iterator<char>());
+
+    if(tempMAC.length() == 0) {
+        std::cerr << GET_MAC_ERROR_MSG;
+        return false;
+    }
+
+    MAC = Mac(tempMAC);
+
+    // =========================================================================
+    // Find Local IP address
     // Make socket which domain is IPv4 and type is UDP
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
     if(sockfd == -1) {
@@ -37,8 +51,6 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully process ioctl\n";
 #endif
-
-    MAC = (uint8_t *)ifr.ifr_addr.sa_data;
     IP = Ip(inet_ntoa(((sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 
     if(close(sockfd)) {
