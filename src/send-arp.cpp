@@ -64,7 +64,7 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
     std::cout << "[DEBUG] Successfully get into function 'getMACByIP'\n";
 #endif
     
-    if(sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request)) {
+    if(not sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request)) {
         return false;
     }
 
