@@ -1,8 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <unistd.h>
+#include <iostream>     // std::cin, std::cout, std::string, ...
+#include <fstream>      // std::ifstream
+#include <unistd.h>     // close
 #include <sys/socket.h> // socket, AF_INET
 #include <sys/types.h>  // some historical (BSD) implementations required this header file, and portable applications are probably wise to include it.
 #include <arpa/inet.h>  // inet_ntop

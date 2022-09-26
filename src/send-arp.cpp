@@ -2,6 +2,8 @@
 
 /*
  * Get Attacker's local MAC address and IP address
+ * get MAC address in system direstory
+ * get IP address using socket and I/O control
 */
 bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     int sockfd;
@@ -22,6 +24,7 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     }
 
     MAC = Mac(tempMAC);
+    // =========================================================================
 
     // =========================================================================
     // Find Local IP address
@@ -57,6 +60,7 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
         std::cerr << CLOSE_ERROR_MSG;
         return false;
     }
+    // =========================================================================
 
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully close file descriptor\n";
@@ -65,6 +69,9 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     return true;
 }
 
+/*
+ * get MAC address by IP using ARP request
+*/
 bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip& myIP) {
     struct pcap_pkthdr* header;
     const u_char* packet;
