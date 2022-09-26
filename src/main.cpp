@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     // send ARP packet at each sender, target
     for(i = 1; i < (argc >> 1); i++) {
         sendIP = Ip(argv[i << 1]);
-        targetIP = Ip(argv[i << 1 + 1]);
+        targetIP = Ip(argv[(i << 1) + 1]);
 
         if(not getMACByIP(pcap, sendMAC, sendIP, myMAC, myIP)) return 1;
         
