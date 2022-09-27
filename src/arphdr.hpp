@@ -46,6 +46,7 @@ struct ArpHdr final {
 	};
 
 	// Operation(op_)
+	// name enum to Mode for using it outside
 	enum Mode: uint16_t {
 		Request = 1, // req to resolve address
 		Reply = 2, // resp to previous request

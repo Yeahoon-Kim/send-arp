@@ -8,6 +8,9 @@ using namespace std;
 
 pcap_t* pcap;
 
+/*
+ * Keyboard interrupt handler
+*/
 void InterruptHandler(const int signo) {
     if(signo == SIGINT) {
         cout << "\nKeyboard Interrupt" << endl;
@@ -83,7 +86,7 @@ int main(int argc, char* argv[]) {
         cout << "[DEBUG] Completely get MAC by IP\n";
         cout << "[DEBUG] sendMAC : " << string(sendMAC) << '\n';
 #endif
-        
+        // print information to chect each addresses
         printInfo(myMAC, myIP, sendMAC, sendIP, targetIP);
 
         if(not attackARP(pcap, sendMAC, sendIP, myMAC, targetIP)) return 1;

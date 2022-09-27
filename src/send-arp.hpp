@@ -17,6 +17,7 @@
 #include "ethhdr.hpp"
 #include "arphdr.hpp"
 
+// for debugging
 // #define DEBUG
 
 #pragma pack(push, 1)

