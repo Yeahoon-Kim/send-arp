@@ -16,3 +16,5 @@
 * https://stackoverflow.com/questions/6767296/how-to-get-local-ip-and-mac-address-c
 * https://stackoverflow.com/questions/1779715/how-to-get-mac-address-of-your-machine-using-a-c-program
 * https://blog.silnex.kr/network-basic-ioctl함수와-ifreq구조체/
+* https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html
+* http://developinghappiness.com/?p=313
