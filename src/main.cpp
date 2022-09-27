@@ -39,11 +39,9 @@ int main(int argc, char* argv[]) {
 
     char* dev;
 	char errbuf[PCAP_ERRBUF_SIZE];
-	struct pcap_pkthdr* header;
-	const u_char* packet;
-	int res, flag, i;
     Mac myMAC, sendMAC, targetMAC;
     Ip myIP, sendIP, targetIP;
+	int i;
 
 
     dev = argv[1];

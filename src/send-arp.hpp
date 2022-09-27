@@ -9,7 +9,7 @@
 #include <sys/ioctl.h>  // ioctl
 #include <net/if.h>     // ifreq
 #include <cstdint>      // uint8_t
-#include <cstring>      // strncpy
+#include <cstring>      // strncpy, memset
 #include <pcap.h>       // pcap
 
 #include "mac.hpp"

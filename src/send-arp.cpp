@@ -7,7 +7,10 @@
 */
 bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     int sockfd;
-    struct ifreq ifr = {0, };
+    struct ifreq ifr;
+
+    // struct initialization
+    memset(&ifr, 0, sizeof(struct ifreq));
 
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully get into function 'getMyInfo'\n";
