@@ -43,7 +43,6 @@ int main(int argc, char* argv[]) {
     Ip myIP, sendIP, targetIP;
 	int i;
 
-
     dev = argv[1];
     pcap = pcap_open_live(dev, BUFSIZ, 1, 1, errbuf);
 
