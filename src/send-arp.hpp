@@ -11,6 +11,7 @@
 #include <cstdint>      // uint8_t
 #include <cstring>      // strncpy, memset
 #include <pcap.h>       // pcap
+#include <map>          // std::map
 
 #include "mac.hpp"
 #include "ip.hpp"
@@ -33,7 +34,7 @@ struct EthArpPacket final {
 #define PCAP_RECEIVE_PACKET_ERROR "Error : Error while pcap_next_ex: "
 
 bool getMyInfo(const std::string& interface, Mac& MAC, Ip& IP);
-bool getMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip& myIP);
+bool resolveMACByIP(pcap_t* pcap, Mac& MAC, const Ip& IP, const Mac& myMAC, const Ip& myIP);
 
 bool sendPacketARP(pcap_t* pcap, 
                    const Mac& destMAC, const Mac& sourceMAC,

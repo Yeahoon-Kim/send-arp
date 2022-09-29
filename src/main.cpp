@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
 	int i;
 
     dev = argv[1];
+    
+    // Turn promiscuous mode on to receive others' packet by give third parameter 1
     pcap = pcap_open_live(dev, BUFSIZ, 1, 1, errbuf);
 
     if(pcap == NULL) {
@@ -77,13 +79,13 @@ int main(int argc, char* argv[]) {
         sendIP = Ip(argv[i << 1]);
         targetIP = Ip(argv[(i << 1) + 1]);
 
-        if(not getMACByIP(pcap, sendMAC, sendIP, myMAC, myIP)) return 1;
+        if(not resolveMACByIP(pcap, sendMAC, sendIP, myMAC, myIP)) return 1;
 
 #ifdef DEBUG
         cout << "[DEBUG] Completely get MAC by IP\n";
         cout << "[DEBUG] sendMAC : " << string(sendMAC) << '\n';
 #endif
-        // print information to chect each addresses
+        // print information to check each addresses
         printInfo(myMAC, myIP, sendMAC, sendIP, targetIP);
 
         if(not attackARP(pcap, sendMAC, sendIP, myMAC, targetIP)) return 1;
